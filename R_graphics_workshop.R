@@ -3,9 +3,8 @@
 # StatLab@UVa Library
 # Clay Ford
 
-##################
-# Helpful R Studio commands 
-##################
+
+# Helpful R Studio commands -----------------------------------------------
 
 # Description       Windows & Linux       Mac 
 # ----------------------------------------------------------------
@@ -13,26 +12,40 @@
 # Previous plot 	  Ctrl+Shift+PageUp     Command+Shift+PageUp 
 # Next plot 	      Ctrl+Shift+PageDown 	Command+Shift+PageDown 
 
-####################################
-# R Graphics Framework
-####################################
 
-# Today we'll use data that come with R (see datasets package);
-# airquality data: Daily air quality measurements in New York, May to September 1973.
+# Packages ----------------------------------------------------------------
+
+# we'll use the following packages today.
+# only submit these lines if you don't already have them installed. 
+install.packages("ggplot2")
+install.packages("scales")
+install.packages("googleVis")
+install.packages("likert")
+
+
+# R Graphics Framework ----------------------------------------------------
+
+# Today we'll use data that come with R (see datasets package); 
+# airquality data:
+# Daily air quality measurements in New York, May to September 1973.
 head(airquality)
-attach(airquality)
 
 # three types of plotting functions:
+
 # (1) High-level plotting - create the graphic
 # create a scatterplot (High-level plot)
-plot(x=Temp, y=Ozone)
+plot(x=airquality$Temp, y=airquality$Ozone)
 
 # (2) Low-level plotting - add extra information
-points(x=mean(Temp),y=mean(Ozone,na.rm=T),pch=16,col="red")
+points(x=mean(airquality$Temp),
+       y=mean(airquality$Ozone,na.rm=T),
+       pch=19,col="red")
 
 # (3) interactive plotting - add/extract information
-identify(x=Temp,y=Ozone) # label point(s) you click (default is index value in vector)
-locator(1) # show coordinates of where I click
+# label point(s) you click (default is row number)
+identify(x=airquality$Temp,y=airquality$Ozone) 
+# show coordinates of where I click
+locator(1) 
 
 # Using Graphics Parameters
 # Use the par() function to access and modify the list of graphics parameters
@@ -49,8 +62,8 @@ par("mfrow") # see current setting; 1 x 1 plotting area
 par(mfrow = c(1, 2)) # set to 1 row x 2 columns (ie, 2 graphs side-by-side)
 
 # plot histograms of Temp and Ozone (high-level plots)
-hist(Temp)
-hist(Ozone)
+hist(airquality$Temp)
+hist(airquality$Ozone)
 
 # now go up and re-do the scatter plot and see what happens.
 # notice the mfrow setting persists;
@@ -60,10 +73,10 @@ par(mfrow = c(1, 1)) # set to 1 x 1 (ie, the default)
 # "clear all" button in R Studio
 
 # some par() settings can be set INSIDE plotting functions
-hist(Temp)
+hist(airquality$Temp)
 # change the size of the title; 
 # cex.main is a graphics parameter, not an argument for hist()
-hist(Temp, cex.main=1.5) # active during the execution of the function only
+hist(airquality$Temp, cex.main=1.5) # active during the execution of the function only
 par("cex.main") # see current setting; still set to 1.2
 
 # R Graphics parameters...
@@ -71,9 +84,8 @@ par("cex.main") # see current setting; still set to 1.2
 # others can be set as arguments to high-level plotting functions (example: cex.main)
 
 
-####################################
-# Common graphs in R
-####################################
+
+# Common graphs in R ------------------------------------------------------
 
 
 # --- SCATTER PLOT --- # 
@@ -82,40 +94,54 @@ par("cex.main") # see current setting; still set to 1.2
 # from each of 3 species of iris
 
 head(iris)
-attach(iris)
-plot(Petal.Width, Petal.Length)
-plot(iris) # pairwise scatterplots; see also pairs()
+str(iris)
+
+# basic scatter plot
+plot(x=iris$Petal.Width, iris$Petal.Length)
+
+# typing name of data before each variable gets tedious;
+# can use "formula" notation with plot (y ~ x)
+plot(Petal.Length ~ Petal.Width, data=iris)
 
 # let's customize the plot using arguments
 # with title and labels and blue dots
-plot(Petal.Width, Petal.Length, 
+plot(Petal.Length ~ Petal.Width, data=iris,
      main="Petal Length vs. Petal Width\nIris Dataset",
-     xlab="Petal Length", ylab="Petal Width", pch=16, col="blue")
+     xlab="Petal Length", ylab="Petal Width",
+     pch=20, col="blue",
+     ylim=c(0,7), xlim=c(0,2.5))
+
 # pch = plotting character; to see what first 25 look like
 plot(1:25, pch=1:25)
 # 26:31 - unused (and ignored).
 # 32:127 - ASCII characters.
 
-# scatter plot by Species with some jitter
-# jitter adds some "noise"
-plot(jitter(Petal.Width), jitter(Petal.Length), 
+# scatter plot by Species 
+plot(Petal.Length ~ Petal.Width, data=iris, 
      main="Petal Length vs. Petal Width\nIris Dataset",
      xlab="Petal Length", ylab="Petal Width", 
-     pch=16, col=as.integer(Species)) # use factor level integer codes for col value
+     pch=20, col=Species,
+     ylim=c(0,7), xlim=c(0,2.5))
 
 # color codes mapped to palette
 palette()
 
+# see available colors (657!)
+colors() 
+
+# customze your palette
+palette(c("gray20","gray40","gray60"))
+palette()
+
 # scatter plot by Species - grayscale
-colors() # see available colors (657!)
-palette(c("gray20","gray40","gray60")) # customze your palette
-plot(jitter(Petal.Width), jitter(Petal.Length), 
+plot(Petal.Length ~ Petal.Width, data=iris, 
      main="Petal Length vs. Petal Width\nIris Dataset",
      xlab="Petal Length", ylab="Petal Width", 
-     pch=16, col=as.integer(Species)) 
+     pch=20, col=Species,
+     ylim=c(0,7), xlim=c(0,2.5))
 
 # add legend with a low-level legend() function
-legend(x="topleft",legend=levels(Species), pch=16,
+legend(x="topleft",legend=levels(iris$Species), pch=20,
        col=1:3)
 
 # In legend can also set x = bottomright", "bottom", "bottomleft", 
@@ -123,66 +149,59 @@ legend(x="topleft",legend=levels(Species), pch=16,
 
 palette("default") # restore color palette to default
 
-# The car package has an enhanced scatter plot
-install.packages("car") # if you don't already have this package
-library(car) # Companion to Applied Regression
-
-# The car scatterplot() function
-scatterplot(Petal.Width, Petal.Length)
-
-# scatterplots by group
-scatterplot(jitter(Petal.Width), jitter(Petal.Length), 
-            main="Petal Length vs. Petal Width\nIris Dataset",
-            xlab="Petal Length", ylab="Petal Width",
-            groups=Species, # specify the group variable
-            by.groups=TRUE) # fit regression lines by groups
-
-# how did I know about groups and by.groups?
-help(scatterplot)
-
-# move the legend inside the plot by
-# combining high-level and interactive functions
-scatterplot(jitter(Petal.Width), jitter(Petal.Length), 
-            main="Petal Length vs. Petal Width\nIris Dataset",
-            xlab="Petal Length", ylab="Petal Width",
-            groups=Species, by.groups=TRUE, 
-            legend.coords=locator(1)) 
-
 
 # --- HISTOGRAM/DENSITY PLOT --- #
 
 # visualize distribution of continuous data
-# use faithful data set; contains eruption time and waiting time
-attach(faithful)
-hist(eruptions)
-hist(eruptions, breaks=20)
 
-rug(eruptions) # draw data on x axis as small vertical lines
-points(mean(eruptions),0,pch=19, col="blue", cex=2) # add a dot for the mean
-points(median(eruptions),0,pch=19, col="red", cex=2) # add a dot for the median
+# use faithful data set; Waiting time between eruptions and the duration of the
+# eruption for the Old Faithful geyser in Yellowstone National Park.
+hist(faithful$eruptions) # length of eruptions in mins
+hist(faithful$eruptions, breaks=20)
+
+# add a rug (low-level function)
+# draw data on x axis as small vertical lines
+rug(faithful$eruptions)
+
+# add points to identify mean and median
+# cex=2 means 2 times bigger than the default
+points(x = mean(faithful$eruptions), y = 0,
+       pch=19, col="blue", cex=2) 
+points(x = median(faithful$eruptions), y = 0,
+       pch=19, col="red", cex=2)
 
 # save hist() output values; add counts to histogram
-sh <- hist(eruptions, breaks=20)
+sh <- hist(faithful$eruptions, breaks=20, main="Distribution of Old Faithful Eruptions")
 sh
+# the text function adds text to a graph
+# the labels argument specifies the text
 text(x=sh$mids, y=sh$counts+1, labels=sh$counts, col = "blue3")
 
-# plot proportions (ie, a true histogram)
-hist(eruptions, breaks=20, freq=FALSE)
+
+# plot proportions (ie, a true histogram) with freq=FALSE
+hist(faithful$eruptions, breaks=20, freq=FALSE, 
+     main="Distribution of Old Faithful Eruptions", 
+     xlab="Eruption time in mins")
 # add kernel density estimate (ie, smooth line)
-lines(density(eruptions))
+lines(density(faithful$eruptions))
 # adjust the bandwidth if you want
-lines(density(eruptions, adjust = 0.5), col="red") # more wiggly
-lines(density(eruptions, adjust = 0.25), col="blue") # even more wiggly
-lines(density(eruptions, adjust = 1.25), col="orange") # less wiggly
+lines(density(faithful$eruptions, adjust = 0.5), col="red") # more wiggly
+lines(density(faithful$eruptions, adjust = 0.25), col="blue") # even more wiggly
+lines(density(faithful$eruptions, adjust = 1.25), col="orange") # less wiggly
+# add a legend
+legend(x = "topright",legend = c(0.25, 0.5, 1, 1.25), 
+       col = c("blue", "red", "black", "orange"), lty=1, 
+       title = "bandwidth", cex=0.8)
 
 
 # --- BOX PLOT --- #
 
-# boxplot() with formula interface
-boxplot(Petal.Width ~ Species, data=iris) 
+# distribution of numeric values by groups
+
+boxplot(Sepal.Length ~ Species, data=iris) 
 
 # with a "notch" and y label
-boxplot(Petal.Width ~ Species, data=iris, ylab="Petal Width (cm)",
+boxplot(Sepal.Length ~ Species, data=iris, ylab="Petal Width (cm)",
         notch = TRUE)
 # if notch is TRUE, a notch is drawn in each side of the boxes. 
 # If the notches of two plots do not overlap this is 'strong evidence' 
@@ -194,27 +213,32 @@ boxplot(Petal.Width ~ Species, data=iris, ylab="Petal Width (cm)",
 # first set margins using par(); need more space on right side;
 # mar = number of lines of margin to be specified (bot, left, top, right);
 # simulateously set new, and save old, par settings
+par("mar")
 op <- par(mar=c(5.1, 4.1, 4.1, 5.1))
 op # old settings saved as "op"
 par("mar") # current settings
-boxplot(Petal.Width ~ Species, data=iris, ylab="Petal Width (cm)", xlab="Species",
-        main="Petal Width by Species",
+boxplot(Sepal.Length ~ Species, data=iris, ylab="Sepal Length (cm)", 
+        xlab="Species",
+        main="Sepal Length by Species",
         boxwex = 0.25, # make boxes thinner
         col="gray")
 
 # add axis for inches using low-level axis() function
 # first create "pretty breakpoints"
-wdInches <- pretty(range(Petal.Width*0.393701))
+# multiply by 0.393701 to convert cm to inches 
+wdInches <- pretty(range(iris$Sepal.Length*0.393701))
 wdInches
-# now add axis: 4=right side, at=where to place tick marks,lab=what to put on the axis
+# now add axis: 4=right side, at=where to place tick marks,
+# lab=what to put on the axis
 axis(side=4, at=wdInches/0.393701, lab=wdInches) 
+
 # finally add axis label using low-level mtext() function
-mtext("Petal Width (in)", side=4, line=3)
+mtext("Sepal Length (in)", side=4, line=3)
 
 # add means to box plot using low-level points() function
-meanWidth <- tapply(Petal.Width, Species, mean)
+meanWidth <- aggregate(Sepal.Length ~ Species, data=iris, mean)
 meanWidth
-points(1:3, meanWidth, pch=18)
+points(1:3, meanWidth[,2], pch=18)
 
 # to restore to original settings, call par on "op" object we created earlier:
 par(op)
@@ -226,8 +250,8 @@ par("mar")
 # -- STRIPCHART --- #
 
 # one dimensional scatter plots; good alternative to boxplots when data is small
-# Data: experiment to measure effectiveness of feed supplements on growth rate of chickens
-attach(chickwts)
+# Data: experiment to measure effectiveness of feed supplements on growth rate
+# of chickens
 head(chickwts)
 stripchart(weight ~ feed, data=chickwts)
 
@@ -236,18 +260,23 @@ stripchart(weight ~ feed, data=chickwts, method="jitter")
 
 # rotate and change dots
 stripchart(weight ~ feed, data=chickwts, method="jitter", 
-           vertical=TRUE, pch=1, col="grey60")
+           vertical=TRUE, pch=1, col="grey60", 
+           main="Chick Weight by Feed")
+
 # add mean with standard error bars
 # calculate mean for each group
-meanWeight <- tapply(weight, feed, mean) 
+# tapply: (1) the measure (2) the grouping variable (3) the statistic
+meanWeight <- tapply(chickwts$weight, chickwts$feed, mean) 
 # calculate SE for each grpup
-seWeight <- tapply(weight, feed, function(x)sd(x)/sqrt(length(x))) 
+seWeight <- tapply(chickwts$weight, chickwts$feed, 
+                   function(x)sd(x)/sqrt(length(x))) 
+
 # add mean to graph with low-level points() function
 points(1:6,meanWeight,pch=16)
-# add SE bars to graph with low-level arrows() function
-arrows(x0=1:6, y0=meanWeight-1.96*seWeight,
-       x1=1:6, y1=meanWeight+1.96*seWeight,
-       code=3, angle=90)
+# add 2x SE bars to graph with low-level segments() function;
+# draws line from (x0,y0) to (x1,y1)
+segments(x0=1:6, y0=meanWeight-2*seWeight,
+         x1=1:6, y1=meanWeight+2*seWeight)
 
 
 # --- BAR CHART/BAR GRAPH --- #
@@ -256,28 +285,36 @@ arrows(x0=1:6, y0=meanWeight-1.96*seWeight,
 
 library(MASS) # has a dataset I want to use
 head(Cars93) # Data from 93 Cars on Sale in the USA in 1993
-attach(Cars93)
 
 # bar graph of counts of Car Type
-Type
-table(Type)
-barplot(table(Type)) # first argument: vector or matrix of values
+Cars93$Type
+table(Cars93$Type)
+
+# barplot()
+# first argument: vector or matrix of values
+barplot(table(Cars93$Type)) 
+
+# save table
+types <- table(Cars93$Type)
 
 # change y axis limits
-barplot(table(Type), ylim=c(0,25)) 
+barplot(types, ylim=c(0,25)) 
 # draw a box around the plot and add title
 box(which="plot")
-title("Breakdown by Car Type")
+title("Counts of Car Type")
 
 # let's include Origin in our graph
-table(Origin, Type)
-barplot(table(Origin, Type), beside=TRUE) # adjacent
+table(Cars93$Origin, Cars93$Type)
+types2 <- table(Cars93$Origin, Cars93$Type)
 
+barplot(types2, beside=TRUE) # adjacent
+
+# barplot has built-in legend argument
 # add legend, make y axis go to 20, set colors
-barplot(table(Origin, Type), beside = TRUE, 
-        legend=levels(Origin),
+barplot(types2, beside = TRUE, 
+        legend=levels(Cars93$Origin),
         ylim=c(0,20), xlab="number of cars",
-        main="Breakdown by Car Type", col=c(4,8))
+        main="Counts of Car Type by Origin", col=c(4,8))
 
 
 # --- DOT CHART --- #
@@ -287,11 +324,12 @@ barplot(table(Origin, Type), beside = TRUE,
 
 # first argument: either a vector or matrix of numeric values
 # again we'll use the Cars93 dataset
-dotchart(as.vector(table(Type))) 
-# add labels
-dotchart(sort(as.vector(table(Type))), 
-         labels=levels(Type),
-         pch=16, main="Breakdown by Car Type")
+summary(Cars93$Type)
+# dotchart doesn't work on tables 
+dotchart(summary(Cars93$Type)) 
+# add labels and sort by count
+dotchart(sort(summary(Cars93$Type)),
+         pch=16, main="Counts of  Car Type")
 
 
 # --- PIE CHARTS --- #
@@ -307,22 +345,21 @@ help(pie)
 
 # back to airquality data
 head(airquality)
-# need to wrangle month and day columns into a single vector of dates
-date <- paste(Month,Day,"1973",sep="/")
-date
-airquality$date  <- as.Date(date,"%m/%d/%Y")
+# need to wrangle month and day columns into a single vector of dates;
+# life is easier if date is formatted as YYYY-MM-DD
+date <- paste("1973", airquality$Month, airquality$Day, sep="-")
+head(date)
+# convert date to Date object and add to airquality data frame
+airquality$date  <- as.Date(date)
 head(airquality)
 str(airquality)
-library(xts) # eXtensible Time Series package 
-# create time series object: xts(data, corresponding times/dates)
-aqTemps <- xts(airquality$Temp, airquality$date) 
-plot(aqTemps) # time series plot; see help(plot.xts)
-plot(aqTemps,major.ticks="months") # add one label per month
+# basic time series plot
+plot(Temp ~ date, data=airquality, type="l")
+plot(Temp ~ date, data=airquality, type="b")
+plot(Temp ~ date, data=airquality, type="b", pch=20)
+plot(Temp ~ date, data=airquality, type="o", pch=20)
 
-lag.plot(aqTemps, lags=4) # lag plots; first 4
-acf(aqTemps) # autocorrelation plot
 
-rm(date, aqTemps)
 
 # --- LINE GRAPH --- #
 
@@ -330,11 +367,11 @@ rm(date, aqTemps)
 # time: a numeric vector of times at which blood samples were drawn (hr).
 # conc: a numeric vector of plasma concentrations of indomethacin (mcg/ml).
 head(Indometh, n=12)
-attach(Indometh)
 
-plot(time, conc, type="l") # not what we want!
-# use formula method: dependent ~ independent
-# allows us to use subset argument
+# plot conc over time by subject
+# type="l" means plot a line
+plot(conc ~ time, data=Indometh, type="l") # not what we want!
+
 # let's subset for subject 1
 plot(conc ~ time, data=Indometh, subset= Subject==1, type="l")
 # and now add other subjects...
@@ -348,58 +385,23 @@ lines(conc ~ time, data=Indometh, subset= Subject==6, type="l", col=6)
 
 # let's fix the y axis and work smarter, not harder
 plot(conc ~ time, data=Indometh, subset= Subject==1, type="l", 
-     ylim=range(conc))
+     ylim=range(conc), main="Concentrations over Time by Subject")
 for(i in 2:6){
   lines(conc ~ time, data=Indometh, subset= Subject==i, type="l", col=i)
 }
 
 # add a legend
-legend("topright",legend=unique(Subject),lty=1, col=1:6, title="Subjects")
+legend("topright",legend=unique(Indometh$Subject),lty=1, 
+       col=1:6, title="Subjects")
 
-# we can work even smarter using ggplot! (later)
-
-# --- REGRESSION PLOTS --- #
-
-# let's use airquality again
-plot(Ozone ~ Temp, data=airquality) # scatterplot
-
-# simple linear regression
-mod1 <- lm(Ozone ~ Temp, data=airquality) # regress Ozone on Temp
-summary(mod1)
-abline(mod1) # add fitted regression line; low-level function
-# use plot to create diagnostic plots
-par(mfrow=c(2,2)) # so I can plot 4 graphs in one window
-plot(mod1) # plot produces diagnostic for lm objects
-# help(plot.lm) - see details about this plotting method for lm objects
-
-par(mfrow=c(1,1)) # now I just want 1 graph in one window
-plot(Ozone ~ Temp, data=airquality) # scatterplot
-
-# add a squared term
-mod2 <- lm(Ozone ~ Temp + I(Temp^2), data=airquality)
-summary(mod2)
-
-# add regression line with low-level lines() function
-# can't use abline() for this
-# first predict values
-xmin <- min(airquality$Temp)
-xmax <- max(airquality$Temp)
-m2vals <- predict(mod2, newdata=data.frame(Temp=seq(xmin,xmax,length.out=100)), 
-                  interval="confidence")
-m2vals
-# add fitted quadratic line
-lines(seq(xmin,xmax,length.out=100), m2vals[,"fit"], col="blue") 
-# add confidence interval for fitted quadratic line
-lines(seq(xmin,xmax,length.out=100), m2vals[,"lwr"],lty=2, col="blue") # lower bound
-lines(seq(xmin,xmax,length.out=100), m2vals[,"upr"],lty=2, col="blue") # upper bound
+# we can work even smarter using ggplot! (coming up shortly)
 
 
-####################################
-# Saving R graphics
-####################################
+
+# Saving R graphics -------------------------------------------------------
 
 # R graphs can be saved multiple ways.
-# In R Studio: Export...Save Plot as...
+# In R Studio: Export...Save as Image...
 # In R GUI: File...Save as...
 # Available formats include PNG, TIF, JPG, PDF, BMP, EPS
 
@@ -407,7 +409,7 @@ lines(seq(xmin,xmax,length.out=100), m2vals[,"upr"],lty=2, col="blue") # upper b
 # useful for automating creation of lots of graphs
 
 # first issue the command; "opens" a graphing device; nothing visible happens
-# file will be saved in working directory; in R studio visible in Console header
+# file will be saved in working directory
 help(png)
 png(file = "iris1.png")
 # then issue plotting commands; notice it doesn't appear in R Studio window
@@ -415,9 +417,10 @@ stripchart(Petal.Width ~ Species, data=iris, method="jitter")
 # then 
 dev.off()
 
-# Example: create and save stripcharts of all iris measurements in your working directory
+# Example: create and save stripcharts of all iris measurements in your working
+# directory
 for(i in 1:4){
-  png(file = paste("sc",names(iris)[i],".png",sep=""))
+  png(file = paste0("sc",names(iris)[i],".png"))
   stripchart(iris[,i] ~ Species, data=iris, method="jitter", main=names(iris)[i])
   dev.off()
 }
@@ -428,9 +431,8 @@ rm(list = ls())
 
 # back to presentation...
 
-####################################
-# ggplot2
-####################################
+
+# ggplot2 -----------------------------------------------------------------
 
 # install.packages("ggplot2") # if you don't aready have
 library(ggplot2)
@@ -445,72 +447,86 @@ ggplot(iris, aes(x = Petal.Width, y = Petal.Length)) +
 ggplot(iris, aes(x = Petal.Width, y = Petal.Length, color=Species)) + 
   geom_point() 
 
-# mapping species to color and shape and making points bigger
+# add shape=Species to aes()
+ggplot(iris, aes(x = Petal.Width, y = Petal.Length, shape=Species)) + 
+  geom_point() 
+
+# shape and color
+ggplot(iris, aes(x = Petal.Width, y = Petal.Length, 
+                 shape=Species, color=Species)) + 
+  geom_point() 
+
+# mapping species to color and shape and making points bigger and jittered
 ggplot(iris, aes(x = Petal.Width, y = Petal.Length, 
                  color=Species, shape=Species)) + 
   geom_point(size=3, position = "jitter") 
 
 # mapping species to color and Sepal.Length to size
 # balloon scatter plot
-ggplot(iris, aes(x = Petal.Width, y = Petal.Length, color=Species, size=Sepal.Length)) + 
+ggplot(iris, aes(x = Petal.Width, y = Petal.Length, 
+                 color=Species, size=Sepal.Length)) + 
   geom_point(position = "jitter") 
 
-# save the plot to an object
-sp1 <- ggplot(iris, aes(x = Petal.Width, y = Petal.Length, color=Species, shape=Species)) + 
-  geom_point(size=3, position = "jitter") 
-sp1
-str(sp1) # notice it includes the entire dataset
+# fix the labels and add a title
+ggplot(iris, aes(x = Petal.Width, y = Petal.Length, 
+                 color=Species, size=Sepal.Length)) + 
+  geom_point(position = "jitter") +
+  labs(y="Petal Length (cm)", x= "Petal Width (cm)", 
+       size="Sepal Length", title="Iris Balloon Plot")
 
-# could save this image as an R object and send to someone without also having to send data set
-#          YOU: save(sp1,file="sp1.Rda")
-# SOMEONE ELSE: load("sp1.Rda")
-
-# tack on a title
-sp1 + ggtitle("Petals of the Iris data set")
-
-# adding fitted regression lines with CI and make b/w
+# adding fitted regression lines with CI 
 ggplot(iris, aes(x = Petal.Width, y = Petal.Length, color=Species)) + 
   geom_point(position="jitter") +
   geom_smooth(method="lm") + 
-  scale_colour_grey()
+  ggtitle("Petals of the Iris data set") 
   
 
 # revisit the airquality data
-ggplot(airquality, aes(x = Temp, y = Ozone)) + 
+# scatter plot with smooth line saved as object:
+p <- ggplot(airquality, aes(x = Temp, y = Ozone)) + 
   geom_point() +
   geom_smooth() # loess (locally weighted polynomial curve)
+p
 
-# plot polynomial regression line
-ggplot(airquality, aes(x = Temp, y = Ozone)) + 
-  geom_point() +
-  stat_smooth(method="lm", formula = y ~ x + I(x^2)) + 
-  ggtitle("Ozone levels versus Temperature")
+# "zoom in" on plot with coord_cartesian()
+p + coord_cartesian(xlim=c(70,80), ylim = c(0, 50))
 
 
 # --- BOX PLOT --- #
 ggplot(iris, aes(x=Species, y=Petal.Width)) +
   geom_boxplot()
+
 # skinnier box plot with mean included
 ggplot(iris, aes(x=Species, y=Petal.Width)) +
   geom_boxplot(width=0.5) +
   stat_summary(fun.y = mean, geom="point", color="red")
 
+
+# --- STRIP CHART --- #
+
+ggplot(chickwts, aes(x=feed, y=weight)) + 
+  geom_point(position = position_jitter(w = 0.1, h = 0))
+
+# with confidence limits
+# first need to calculate means and standard errors
+fMean <- tapply(chickwts$weight, chickwts$feed, mean)
+fSE <- tapply(chickwts$weight, chickwts$feed, function(x) sd(x)/sqrt(length(x)))
+# now create data frame; recall that ggplot requires data frame
+chick2 <- data.frame(feed=names(fMean), fMean, fSE)
+
+# not plot strip chart and error bars
+# notice we call two data frames
+ggplot(chickwts, aes(x=feed, y=weight)) + 
+  geom_point(position = position_jitter(w = 0.1, h = 0)) +
+  geom_point(aes(x=feed, y=fMean), data=chick2, color="red", size=3) +
+  geom_errorbar(aes(x=feed, y=fMean, ymin=fMean - 2*fSE, ymax=fMean + 2*fSE), 
+                data=chick2, width=0.1)
+
+
 # --- DOT PLOT --- #
-ggplot(iris, aes(x=Petal.Length)) +
-  geom_dotplot()
-# dot plot by group; alpha argument makes dots more transparent
-ggplot(iris, aes(x=Petal.Length, fill=Species)) +
-  geom_dotplot(binwidth=0.15, alpha = 1/3) +
-  scale_y_continuous(breaks=NULL) # gets rid of the y-axis labels
-
-# dot plot with boxplot
-ggplot(iris, aes(x=Species, y=Petal.Length)) +
-  geom_boxplot() +
-  geom_dotplot(binaxis="y", binwidth=0.15, stackdir="center", fill=NA)
-# binaxis = which axis to bin along  
-
 # cleveland dot plot
 # use state.x77 data; it's a matrix, so need to convert to data frame
+state.x77
 class(state.x77)
 states <- data.frame(state=rownames(state.x77),state.x77, row.names = NULL)
 head(states)
@@ -545,17 +561,17 @@ ggplot(states, aes(x=Area, y=reorder(state, Area))) +
 # --- HISTOGRAM --- #
 ggplot(faithful, aes(x=eruptions)) +
   geom_histogram()
-# note the warnings; developer firmly believes you should not accept default binwidth.
-# use the binwdith argument to change
+# note the warnings; developer firmly believes you should not accept default
+# binwidth. use the binwdith argument to change
 
 # with different color bars
 ggplot(faithful, aes(x=eruptions)) +
-  geom_histogram(fill="white", color="black", binwidth=0.3) 
+  geom_histogram(fill="white", color="black", binwidth=0.1) 
 
 # "true" histogram - density instead of counts
 # ..density.. refers to a variable generated by geom_histogram
 ggplot(faithful, aes(x=eruptions)) +
-  geom_histogram(aes(y = ..density..), fill="white", color="black", binwidth=0.3) +
+  geom_histogram(aes(y = ..density..), fill="white", color="black", binwidth=0.1) +
   geom_density(adjust=0.5)
 
 # mapping bin counts to color of histogram
@@ -566,12 +582,12 @@ ggplot(faithful, aes(x=eruptions)) +
 # back to iris data
 # in groups (vertical facet)
 ggplot(iris, aes(x=Petal.Length)) +
-  geom_histogram(fill="white", color="black", binwidth=0.2) +
+  geom_histogram(binwidth=0.2) +
   facet_grid(Species ~ .) # vertical ~ horizontal
 
 # in groups (horizontal facet)
 ggplot(iris, aes(x=Petal.Length)) +
-  geom_histogram(fill="white", color="blue", binwidth=0.25) +
+  geom_histogram(binwidth=0.2) +
   facet_grid(. ~ Species) 
 
 # overlayed histograms with transparency
@@ -594,29 +610,31 @@ ggplot(iris, aes(x=Species, y=Petal.Length)) +
 # --- LINE GRAPH --- # 
 names(Indometh)
 # recall how we did this above with a loop
-ggplot(Indometh, aes(x=time,y=conc,color=Subject)) +
-  geom_line() +
-  scale_color_discrete(limits=1:6) # this ensures legend is in numeric order
-
-# who said we need colors? Just use group=Subject
 ggplot(Indometh, aes(x=time,y=conc, group=Subject)) +
   geom_line()
 
-# single line graph with error bars
-# first need to create a data set with SE
-# we'll use the plyr package: http://plyr.had.co.nz/
-# install.packages("plyr")
-library(plyr)
-Indo2 <- ddply(Indometh, "time", summarise,
-               N = length(conc),
-               mean = mean(conc),
-               sd = sd(conc),
-               se = sd / sqrt(N))
-Indo2
-ggplot(Indo2, aes(x=time,y=mean)) +
+# with color
+ggplot(Indometh, aes(x=time,y=conc,group=Subject, color=Subject)) +
+  geom_line()
+
+# put legend in numeric order
+ggplot(Indometh, aes(x=time,y=conc,group=Subject, color=Subject)) +
+  geom_line() +
+  scale_color_discrete(limits=1:6)
+
+# single line graph of means at each time point with SE bars
+# first calculate means and SEs
+tMean <- tapply(Indometh$conc, Indometh$time, mean)
+tSE <- tapply(Indometh$conc, Indometh$time, function(x)sd(x)/sqrt(length(x)))
+
+# ggplot requires data in data frame
+Indo2 <- data.frame(time=unique(Indometh$time), tMean, tSE)
+
+# now ready to create plot
+ggplot(Indo2, aes(x=time,y=tMean)) +
   geom_line() +
   geom_point(size=2) +
-  geom_errorbar(aes(ymin=mean-2*se, ymax=mean+2*se), width=.2)
+  geom_errorbar(aes(ymin=tMean-2*tSE, ymax=tMean+2*tSE), width=0.2)
 
 
 # --- BAR GRAPH --- # 
@@ -661,9 +679,9 @@ ggplot(mtcars, aes(x=factor(cyl), fill=factor(am))) +
 # tidy up before moving on
 rm(list=ls())
 
-####################################
-# R package graphics
-####################################
+
+
+# Plotting functions in packages ------------------------------------------
 
 # many R packages include special plotting functions.
 # these are usually functions that do much of the plotting customization for you.
@@ -683,7 +701,9 @@ head(pisaitems)
 str(pisaitems) # all factors
 
 # grab a subset of data: all questions that contain "ST25Q"
-read <- pisaitems[,substr(names(pisaitems), 1,5) == 'ST25Q']
+read <- subset(pisaitems, select = substr(names(pisaitems), 1,5) == 'ST25Q')
+
+# read <- pisaitems[,substr(names(pisaitems), 1,5) == 'ST25Q']
 head(read); dim(read)
 names(read) <- c("Magazines", "Comic books", "Fiction",
                     "Non-fiction books", "Newspapers")
@@ -699,9 +719,9 @@ plot(lread, type="heat")
 methods(plot) # notice plot.likert
 help(plot.likert)
 
-# Example: googleVis package
+# Example: googleVis package 
 # allows users to create web pages with interactive charts based on R data frames
-# tutorial: http://decastillo.github.io/googleVis_Tutorial/
+
 # install.packages("googleVis")
 library(googleVis)
 data(Fruits) # data set that comes with googleVis package
@@ -729,49 +749,48 @@ sandyMap <- gvisMap(sandy, locationvar="LatLong" , tipvar="Tip",
 plot(sandyMap)
 
 
-
-###########
-# EXERCISES
-###########
+# Exercises ---------------------------------------------------------------
 
 # The best way to learn R is to do stuff in R.
 # Try the excerises below. 
 # See "R_graphics_workshop_exercise_answers.R" for answers.
 
-# 1. Load the Cars93 dataset. It's in the MASS library. How many observations and variables does it have?
+# 1. Load the Cars93 dataset. It's in the MASS library. How many observations
+# and variables does it have?
 # 
 # 2. Create two boxplots: MPG city versus Origin and MPG highway versus Origin. 
-#    Put them side-by-side in the same graphing window and make sure you can identify each.
-#    Also, identify any outliers.
+# Put them side-by-side in the same graphing window and make sure you can
+# identify each. Also, identify any outliers.
 # 
-# 3. Create two scatterplots: MPG city (y axis) versus Weight (x axis)
-#    Put them side-by-side in the same graphing window and make sure you can identify each.
+# 3. Create two scatterplots: MPG city (y axis) versus Weight (x axis) Put them
+# side-by-side in the same graphing window and make sure you can identify each.
 # 
-# 4. create a scatterplot using ggplot2 with MPG city on the y axis, weight on the x axis, and the 
-#    dots colored by Origin.
+# 4. create a scatterplot using ggplot2 with MPG city on the y axis, weight on
+# the x axis, and the dots colored by Origin.
 # 
 # 5. repeat #4, but this time include a smooth trend line through the points 
-#    without a shaded confidence interval.
+# without a shaded confidence interval.
 # 
 # 6. create a boxplot using ggplot2 for Price versus Cylinders.
 # 
 # 7. add the title "Price vs. Cylinders" to the graph created in #6.
 # 
-# 8. create a scatterplot of MPG highway (y-axis) versus weight (x-axis), 
-#    fit a linear model where MPG is regressed on Weight,
-#    and then add the fitted line to the plot.
+# 8. create a scatterplot of MPG highway (y-axis) versus weight (x-axis), fit a
+# linear model where MPG is regressed on Weight, and then add the fitted line to
+# the plot.
 # 
-# 9. In #8 it appears a curved line may provide a better fit to the data.
-#    Fit the same model again but with the extra predictor I(Weight^2).
-#    (The I() function means treat Weight^2 "as is".) Then add the fitted line 
-#    to the plot from #8 so you can see both lines. Make the new line blue.
+# 9. In #8 it appears a curved line may provide a better fit to the data. Fit
+# the same model again but with the extra predictor I(Weight^2). (The I()
+# function means treat Weight^2 "as is".) Then add the fitted line to the plot
+# from #8 so you can see both lines. Make the new line blue.
 
 
 # BEGIN TIME-PERMITTING BONUS MATERIAL!
 
-#############################################
-# dynamite plunger plots (or detonator plots)
-#############################################
+
+
+# dynamite plunger plots (or detonator plots) -----------------------------
+
 # comparing means with SE bars
 # some people frown on these; does not convey distribution of data
 # generate some data
@@ -795,13 +814,12 @@ boxplot(a,xlab="a",ylim=c(min(a,b),max(a,b)))
 boxplot(b,xlab="b",ylim=c(min(a,b),max(a,b)))
 
 
+# polygon function --------------------------------------------------------
 
-############################
-# polygon function
-############################
 
-# draws a shape; the first two arguments are the x and y coordinates of a closed figure.
-# It is assumed that the polygon is to be closed by joining the last point to the first point.
+# draws a shape; the first two arguments are the x and y coordinates of a closed
+# figure. It is assumed that the polygon is to be closed by joining the last
+# point to the first point.
 
 # create a blank plotting window
 plot(x=c(1,10), y=c(1,10), type="n", xlab="", ylab="", axes = FALSE)
@@ -828,9 +846,10 @@ top <- dnorm(bot) # y values for polygon
 polygon(x=c(-3,bot,qnorm(0.05)), y=c(0,top,0),col="red")
 text(0,0.1,"P(Z < -1.64) = 0.05")
 
-#############################
-# 3D plots
-#############################
+
+
+# 3D plots ----------------------------------------------------------------
+
 # try the scatterplot3d package
 
 # base R 3D graphing functions
@@ -849,10 +868,9 @@ persp(x, y, z, theta=30, col = "lightblue", shade = 0.75)
 image(x, y, z) # heat map
 
 
-##################
-# Anscombe's Quartet
-##################
 
+
+# Anscombe's Quartet ------------------------------------------------------
 
 # We need tools to easily visualize data in R, especially before analysis.
 # The following will help demonstrate why.
@@ -911,9 +929,7 @@ for(i in 1:4){
 # see also the R help file:  help(anscombe)
 
 
-##################
-# Interactive 3D
-##################
+# Interactive 3D ----------------------------------------------------------
 
 
 # Spinning 3D scatterplot
@@ -934,9 +950,10 @@ plot3d(iris$Petal.Length,  # x variable
        col = brewer.pal(3, "Dark2")[unclass(iris$Species)],
        size = 8)
 
-##############################
-# conditioning plots
-##############################
+
+
+# conditioning plots ------------------------------------------------------
+
 
 # multiple plots with different subsets of data
 # mtcars: Motor Trend Car Road Tests
@@ -944,9 +961,8 @@ plot3d(iris$Petal.Length,  # x variable
 coplot(mpg ~ hp | factor(cyl), data=mtcars, rows=1) 
 
 
-##############################
-# more information on colors
-##############################
+# more information on colors ----------------------------------------------
+
 
 # see what numbers refer to which color
 palette()
