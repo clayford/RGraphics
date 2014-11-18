@@ -34,8 +34,6 @@ Follow along in R Studio as we learn about the following:
 - ggplot2 package
 - Examples of package-specific plotting functions
 
-At the conclusion, optional exercises to complete on your own time.
-
 ## R graphics framework
 
 R graphics are created with three kinds of functions:
